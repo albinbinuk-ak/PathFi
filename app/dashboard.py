@@ -579,8 +579,7 @@ with tab4:
             st.metric("Estimated Distance", f"{distance} m")
             st.metric("Steps", len(path) - 1)
 
-            # Step by step
-            st.write("**Step-by-step:**")
+            
             # Step by step
             st.write("**Step-by-step:**")
             steps = []
