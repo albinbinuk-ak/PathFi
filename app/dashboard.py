@@ -22,6 +22,240 @@ st.set_page_config(
     layout="wide"
 )
 
+
+# ── CUSTOM CSS ────────────────────────────────────────────────
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── BASE ── */
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+.stApp {
+    background: linear-gradient(135deg, #0A0F1E 0%, #0D1628 50%, #0A1020 100%);
+}
+
+/* ── HEADER ── */
+h1 {
+    background: linear-gradient(90deg, #00D4FF, #7B6FFF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    font-size: 2.8rem !important;
+    letter-spacing: -0.5px;
+}
+
+.stApp > header {
+    background: transparent;
+}
+
+/* ── TABS ── */
+.stTabs [data-baseweb="tab-list"] {
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 4px;
+    border: 1px solid rgba(0,212,255,0.1);
+    gap: 4px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(123,111,255,0.15)) !important;
+    color: #00D4FF !important;
+    border-bottom: 2px solid #00D4FF !important;
+}
+
+/* ── BUTTONS ── */
+.stButton > button {
+    background: linear-gradient(135deg, #00D4FF, #7B6FFF);
+    color: #0A0F1E;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 24px;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,212,255,0.25);
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,212,255,0.4);
+    background: linear-gradient(135deg, #33DDFF, #9B8FFF);
+}
+
+.stButton > button:active {
+    transform: translateY(0px);
+}
+
+/* ── CARDS / CONTAINERS ── */
+[data-testid="stVerticalBlock"] > div {
+    border-radius: 12px;
+}
+
+.stAlert {
+    border-radius: 10px;
+    border: none !important;
+}
+
+/* ── SUCCESS / WARNING / ERROR ── */
+[data-testid="stAlert"][data-type="success"] {
+    background: rgba(0, 212, 100, 0.1) !important;
+    border-left: 3px solid #00D464 !important;
+    color: #00D464 !important;
+}
+
+[data-testid="stAlert"][data-type="warning"] {
+    background: rgba(255, 180, 0, 0.1) !important;
+    border-left: 3px solid #FFB400 !important;
+}
+
+[data-testid="stAlert"][data-type="error"] {
+    background: rgba(255, 80, 80, 0.1) !important;
+    border-left: 3px solid #FF5050 !important;
+}
+
+/* ── METRICS ── */
+[data-testid="stMetric"] {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(0,212,255,0.1);
+    border-radius: 12px;
+    padding: 16px !important;
+    transition: all 0.2s ease;
+}
+
+[data-testid="stMetric"]:hover {
+    border-color: rgba(0,212,255,0.3);
+    background: rgba(0,212,255,0.05);
+}
+
+[data-testid="stMetricLabel"] {
+    color: rgba(255,255,255,0.5) !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+[data-testid="stMetricValue"] {
+    color: #00D4FF !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 600;
+}
+
+/* ── PROGRESS BARS (signal strength) ── */
+.stProgress > div > div {
+    background: linear-gradient(90deg, #00D4FF, #7B6FFF) !important;
+    border-radius: 4px;
+}
+
+.stProgress > div {
+    background: rgba(255,255,255,0.06) !important;
+    border-radius: 4px;
+}
+
+/* ── SELECTBOX ── */
+.stSelectbox > div > div {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid rgba(0,212,255,0.15) !important;
+    border-radius: 10px !important;
+    color: white !important;
+}
+
+.stSelectbox > div > div:hover {
+    border-color: rgba(0,212,255,0.4) !important;
+}
+
+/* ── TOGGLE ── */
+.stCheckbox, .stToggle {
+    color: rgba(255,255,255,0.7);
+}
+
+/* ── DIVIDER ── */
+hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.3), transparent);
+    margin: 16px 0;
+}
+
+/* ── CAPTION ── */
+.stCaption {
+    color: rgba(255,255,255,0.35) !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.3px;
+}
+
+/* ── SUBHEADER ── */
+h2, h3 {
+    color: rgba(255,255,255,0.9) !important;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+
+/* ── INFO BOX ── */
+[data-testid="stAlert"][data-type="info"] {
+    background: rgba(123,111,255,0.08) !important;
+    border-left: 3px solid #7B6FFF !important;
+    border-radius: 10px;
+}
+
+/* ── SPINNER ── */
+.stSpinner > div {
+    border-top-color: #00D4FF !important;
+}
+
+/* ── SIDEBAR (if used) ── */
+[data-testid="stSidebar"] {
+    background: rgba(10,15,30,0.95);
+    border-right: 1px solid rgba(0,212,255,0.1);
+}
+
+/* ── PLOTLY CHARTS background ── */
+.js-plotly-plot {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ── SIGNAL PULSE ANIMATION for scan button ── */
+@keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); }
+    70% { box-shadow: 0 0 0 12px rgba(0,212,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(0,212,255,0); }
+}
+
+.stButton > button[kind="primary"] {
+    animation: pulse-ring 2s infinite;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar {
+    width: 4px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(0,212,255,0.3);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,212,255,0.6);
+}
+</style>
+""", unsafe_allow_html=True)
+
+
 # ── LOCATION GRAPH (edit distances here for college) ──────────
 LOCATION_GRAPH = {
     'my_desk':    {'rahul_desk': 5,  'main_door': 15},
@@ -220,7 +454,15 @@ with tab2:
             text=list(results.values())
         )
         fig.update_traces(texttemplate='%{text}%', textposition='outside')
-        fig.update_layout(yaxis_range=[0, 110], showlegend=False)
+        fig.update_layout(
+                yaxis_range=[0, 110],
+                showlegend=False,
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                font=dict(color='rgba(255,255,255,0.7)'),
+                xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+                yaxis=dict(gridcolor='rgba(255,255,255,0.05)')
+            )
         st.plotly_chart(fig, use_container_width=True)
 
         cols = st.columns(3)
@@ -254,7 +496,20 @@ with tab3:
             title='Average WiFi Signal Strength per Location',
             labels={'rssi': 'Signal Strength (dBm)', 'network': 'Network'}
         )
-        fig2.update_layout(xaxis_tickangle=-45)
+        fig2.update_layout(xaxis_tickangle=-45,
+                            paper_bgcolor='rgba(0,0,0,0)',
+                            plot_bgcolor='rgba(0,0,0,0)',
+                            font=dict(color='rgba(255,255,255,0.7)'),
+                            xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+                            yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+                            legend=dict(
+                                bgcolor='rgba(255,255,255,0.03)',
+                                bordercolor='rgba(0,212,255,0.2)',
+                                borderwidth=1
+                                )
+                            )
+          
+           
         st.plotly_chart(fig2, use_container_width=True)
         st.caption("Different signal patterns per location — this is what the ML model learns to distinguish.")
 
