@@ -17,31 +17,36 @@ logging.basicConfig(
 TOKEN = "8891478552:AAFICDWwRAkj8kKLDNNiNgkmHa3qF-K-JJI"
 
 # ── LOCATION GRAPH ────────────────────────────────────────────
-LOCATION_GRAPH = {
-    'my_desk':    {'rahul_desk': 5,  'main_door': 15},
-    'rahul_desk': {'my_desk': 5,     'aadhil': 4,    'main_door': 12},
-    'aadhil':     {'rahul_desk': 4,  'main_door': 8},
-    'main_door':  {'my_desk': 15,    'rahul_desk': 12, 'aadhil': 8}
-}
-LOCATION_LABELS = {
-    'my_desk':    'My Desk',
-    'rahul_desk': "Rahul's Desk",
-    'aadhil':     "Aadhil's Desk",
-    'main_door':  'Main Door'
-}
+def get_locations_from_data():
+    """Auto-generate location graph and labels from CSV"""
+    try:
+        df = pd.read_csv('data/wifi_fingerprints.csv')
+        locations = df['location'].unique().tolist()
+    except Exception:
+        locations = []
 
-# Human readable turn-by-turn directions for each connection
-DIRECTIONS = {
-    ('main_door',  'aadhil'):     "Enter and walk straight ahead",
-    ('aadhil',     'rahul_desk'): "Take a left and walk to the next desk",
-    ('aadhil',     'main_door'):  "Turn around and walk to the exit",
-    ('rahul_desk', 'aadhil'):     "Walk straight to the desk ahead",
-    ('rahul_desk', 'my_desk'):    "Turn right and walk to the corner desk",
-    ('rahul_desk', 'main_door'):  "Walk back toward the entrance",
-    ('my_desk',    'rahul_desk'): "Walk from the corner toward the center",
-    ('my_desk',    'main_door'):  "Walk straight toward the exit",
-    ('main_door',  'rahul_desk'): "Enter and walk to the second desk on left",
-}
+    # Auto-generate labels (convert underscore to title case)
+    labels = {loc: loc.replace('_', ' ').title() for loc in locations}
+
+    # Auto-generate graph (connect every location to every other)
+    # Default distance 10m between all — user can tune later
+    graph = {}
+    for loc in locations:
+        graph[loc] = {}
+        for other in locations:
+            if other != loc:
+                graph[loc][other] = 10  # default 10m
+
+    # Auto-generate directions
+    directions = {}
+    for loc in locations:
+        for other in locations:
+            if other != loc:
+                directions[(loc, other)] = f"Walk from {labels.get(loc, loc)} toward {labels.get(other, other)}"
+
+    return graph, labels, directions
+
+LOCATION_GRAPH, LOCATION_LABELS, DIRECTIONS = get_locations_from_data()
 
 # ── DIJKSTRA ──────────────────────────────────────────────────
 def dijkstra(graph, start, end):

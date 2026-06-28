@@ -50,39 +50,28 @@ MOBILE_OUI_PREFIXES = {
 
 # ── FILTERS ───────────────────────────────────────────────────
 def is_mobile_device(bssid):
-    """Check if BSSID belongs to a known mobile manufacturer"""
     prefix = bssid[:8].lower()
     return prefix in MOBILE_OUI_PREFIXES
 
 def is_stable_and_fixed(bssid, rssi_values, samples):
-    """Combined stability check — MAC prefix + appearance rate + variance"""
-
-    # Layer 1: Hard filter — known mobile MAC
     if is_mobile_device(bssid):
         return False, "mobile MAC prefix"
-
-    # Layer 2: Must appear in at least 70% of scans
     appearance_rate = len(rssi_values) / samples
     if appearance_rate < 0.7:
         return False, f"low appearance ({int(appearance_rate*100)}%)"
-
-    # Layer 3: Signal variance must be low
     if len(rssi_values) > 1:
         mean = sum(rssi_values) / len(rssi_values)
         variance = sum((v - mean) ** 2 for v in rssi_values) / len(rssi_values)
         if variance > 25:
             return False, f"high variance ({variance:.1f})"
-
     return True, "stable"
 
 # ── SCAN ──────────────────────────────────────────────────────
 def scan_wifi_windows():
-    """Scan WiFi networks and return list of dicts"""
     result = subprocess.run(
         ["netsh", "wlan", "show", "networks", "mode=bssid"],
         capture_output=True, text=True
     )
-
     networks = []
     lines = result.stdout.split('\n')
     current_ssid = None
@@ -91,17 +80,14 @@ def scan_wifi_windows():
 
     for line in lines:
         line = line.strip()
-
         if line.startswith("SSID") and "BSSID" not in line:
             parts = line.split(":")
             if len(parts) > 1:
                 current_ssid = parts[1].strip()
-
         elif line.startswith("BSSID"):
             parts = line.split(":", 1)
             if len(parts) > 1:
                 current_bssid = parts[1].strip()
-
         elif line.startswith("Signal"):
             parts = line.split(":")
             if len(parts) > 1:
@@ -122,7 +108,6 @@ def scan_wifi_windows():
 
 # ── COLLECT ───────────────────────────────────────────────────
 def collect_sample(location_name, samples=10):
-    """Collect scans, apply dual-layer filter, return stable row"""
     print(f"\nCollecting data for: {location_name}")
     print(f"Scanning WiFi {samples} times for stability analysis...")
 
@@ -148,16 +133,12 @@ def collect_sample(location_name, samples=10):
     print("\n  Filtering networks...")
     for key, data in all_networks.items():
         stable, reason = is_stable_and_fixed(key, data['rssi_values'], samples)
-
         if not stable:
             print(f"  [skip] {data['ssid']:<30} reason: {reason}")
             unstable_count += 1
             continue
-
         col_name = f"rssi_{data['ssid']}_{key[-5:]}"
-        row[col_name] = round(
-            sum(data['rssi_values']) / len(data['rssi_values']), 2
-        )
+        row[col_name] = round(sum(data['rssi_values']) / len(data['rssi_values']), 2)
         stable_count += 1
         print(f"  [keep] {data['ssid']:<30} avg: {row[col_name]} dBm")
 
@@ -170,18 +151,27 @@ def collect_sample(location_name, samples=10):
     return row
 
 # ── SAVE ──────────────────────────────────────────────────────
-def save_to_csv(row, filepath='data/wifi_fingerprints.csv'):
-    """Append row to CSV"""
+def save_to_csv(row, filepath=None):
+    if filepath is None:
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        filepath = os.path.join(base, 'data', 'wifi_fingerprints.csv')
+
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
     df_new = pd.DataFrame([row])
 
-    if os.path.exists(filepath):
-        df_existing = pd.read_csv(filepath)
-        df_combined = pd.concat([df_existing, df_new], ignore_index=True)
-        df_combined.to_csv(filepath, index=False)
+    if os.path.exists(filepath) and os.path.getsize(filepath) > 10:
+        try:
+            df_existing = pd.read_csv(filepath)
+            df_combined = pd.concat([df_existing, df_new], ignore_index=True)
+            df_combined.to_csv(filepath, index=False)
+            print(f"\n  Saved! Total rows in dataset: {len(df_combined)}")
+        except Exception as e:
+            print(f"  Warning: {e} — starting fresh")
+            df_new.to_csv(filepath, index=False)
+            print(f"\n  Saved! Total rows in dataset: 1")
     else:
         df_new.to_csv(filepath, index=False)
-
-    print(f"\n  Saved! Total rows in dataset: {pd.read_csv(filepath).shape[0]}")
+        print(f"\n  Saved! Total rows in dataset: 1")
 
 # ── MAIN ──────────────────────────────────────────────────────
 if __name__ == "__main__":

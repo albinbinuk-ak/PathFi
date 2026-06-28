@@ -21,9 +21,14 @@ def log_location(location):
         df_new.to_csv(LOG_FILE, index=False)
 
 def get_log():
-    """Return full location log"""
     if os.path.exists(LOG_FILE):
-        return pd.read_csv(LOG_FILE)
+        try:
+            df = pd.read_csv(LOG_FILE)
+            if df.empty or len(df.columns) == 0:
+                return pd.DataFrame(columns=['timestamp', 'date', 'time', 'location'])
+            return df
+        except Exception:
+            return pd.DataFrame(columns=['timestamp', 'date', 'time', 'location'])
     return pd.DataFrame(columns=['timestamp', 'date', 'time', 'location'])
 
 def get_today_summary():
